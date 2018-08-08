@@ -3,11 +3,14 @@
 % USER INPUTS
 
 % Input dimensions of beam 
-l = input('What is the length of your beam?');
-w = input('What is the width of your beam?');
+l = input('What is the length of your beam? (in feet)');
+w = input('What is the width of your beam? (in feet)');
+if isnumeric(l) == 0 || isnumeric(w) == 0
+    error('Input must be a numerical value')
+end 
 
 % Specify tolerance
-tol = input('What is the desired tolerance you want?');
+tol = input('How long do you want each element to be?');
 
 % Specify material properties
 % "Aluminum"
@@ -16,8 +19,12 @@ tol = input('What is the desired tolerance you want?');
 material = input('What is the material of the beam?');
 
 % Apply boundary conditions 
-% Fixtures 
+% Fixtures
+fx = input('Specifiy the range of x dimension over which the material will be fixed');
+fy = input('Specifiy the range of y dimension over which the material will be fixed');
 % Loads
+ff = input('Specifiy the range of x y dimensions over which the force will be applied');
+fn = input('Specify the force in newtons')
 
 
 % --------------------------------
