@@ -10,7 +10,7 @@ if isnumeric(l) == 0 || isnumeric(w) == 0
 end 
 
 % Specify tolerance
-tol = input('How long do you want each element to be?');
+tol = input('About how long do you want each basic element to be?');
 
 % Specify material properties
 % "Aluminum"
@@ -24,7 +24,7 @@ fx = input('Specifiy the range of x dimension over which the material will be fi
 fy = input('Specifiy the range of y dimension over which the material will be fixed');
 % Loads
 ff = input('Specifiy the range of x y dimensions over which the force will be applied');
-fn = input('Specify the force in newtons')
+fn = input('Specify the force in newtons');
 
 
 % --------------------------------
@@ -32,8 +32,12 @@ fn = input('Specify the force in newtons')
 % PREPROCESSING: TRANSLATING THE USER INPUT INTO FEA DATA
 
 % Determine how many nodes we need (nn) base on tolerance
+nl = ceil(l/tol);
+nw = ceil(w/tol);
 % Create nodes matrix
+
 % Determine degrees of freedom based no number of nodes
+
 
 % Create connectivity matrix
 % Determine number of elements based on connectivity matrix
