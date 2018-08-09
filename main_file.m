@@ -35,41 +35,56 @@ fn = input('Specify the force in newtons');
 nl = ceil(l/tol);
 nw = ceil(w/tol);
 % Create nodes matrix
+nodes = [];
 
-% Determine degrees of freedom based no number of nodes
-
+% Determine degrees of freedom based on number of nodes
+dof = ;
 
 % Create connectivity matrix
+conn = ;
 % Determine number of elements based on connectivity matrix
+ne = ;
 
 % Define material propertieis 
 % E = "Young's Modulus"
 % A = "Cross sectional area of each element"
+E = ;
+A = ;
 
 % Define boundary conditions
 % According to the fixtures, which nodes are constrained? which nodes have
 % forces acting on them?
+free = ;
+fixed = ;
+load = ;
 
 % --------------------------------
 
 % PROCESSING
 
 % Create global stiffness matrix
+K = zeros(dof);
 % Create displacement vector
+d = zeros(dof,1);
+% Calculate local stiffness matrices at each element and input them into
+% global stiffness matrix 
+for ii=1:ne
+    n1 = conn(ii,1);
+    n2 = conn(ii,2);
+    
+    % Determine x y coordinate of the two nodes
+    x1 = nodes(n1,1); y1 = nodes(n2,2);
+    x2 = nodes(n1+1,1); y2 = nodes(n2+1,2);
+    kii = loc_stiff(E,A,L,x1,y1,x2,y2);
+    
+    % Scatter local stiffness matrix into global matrix
+    K = loc2glob(kii,n1,n2);
 
-% Calculate local stiffness matrices at each element
-% Process:
-% Determine x y coordinate of the two nodes
-% Determine sine and cosine value based on the element's inclination 
-% Solve local stiffness matrix
-% input local stiffness matrix into global stiffness matrix
-
-
+end
 % Solve for displacement
-
+d(free) = K(free)\load(free);
 % --------------------------------
 
 % POST PROCESSING 
 
 % (to be done)
-
