@@ -1,5 +1,5 @@
 function k=loc_stiff_t(E,A,x1,y1,x2,y2)
-% LOC_STIFF computes the local stiffness matrix of a 2D TRUSS ELEMENT with
+% LOC_STIFF computes the local stiffness matrix k of a 2D TRUSS ELEMENT with
 % young's modulus E and Cross-sectional Area A (material properties), and
 % nodes at (x1,y1) and (x2,y2)
 % Note: this function works for 2D truss elements only, as there are
