@@ -93,6 +93,11 @@ d(free) = K(free)\load(free);
 % Re-structure d into normal displacement
 u = d(1:2:end);
 v = d(2:2:end);
+
+% Create new matrix describing the new position of the nodes after force is
+% applied
+node_new = [node(:,1)+200*u, node(:,2)+200*v];
+
 % --------------------------------
 
 % POST PROCESSING 
