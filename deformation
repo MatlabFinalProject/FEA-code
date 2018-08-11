@@ -1,6 +1,8 @@
-function B = deformation(x1,y1,x2,y2)
-% DEFORMATION calculates the deformation matrix of a 2D truss element with nodes
-% at (x1,y1) and (x2,y2).
+function B = deformation_t(x1,y1,x2,y2)
+% DEFORMATION_T calculates the deformation matrix B of a 2D TRUSS ELEMENT 
+% with nodes at (x1,y1) and (x2,y2).
+% Note: this function works for 2D truss elements only, as there are
+% different ways to calculate the stiffness matrix of different elements
 
 % Define line length, cosine and sine of the function
 
@@ -8,5 +10,7 @@ L = sqrt((x2-x1)^2+ (y2-y1)^2); % Element length
 c = (x2-x1)/L; % cosine of this specific element
 s = (y2-y1)/L; % sine of this specific element
 
-% Compute 
+% Compute the deformation matrix
 B = 1/L*[-c -s c s];
+
+end
