@@ -1,0 +1,14 @@
+function k=loc_stiff2(E,A,x1,y1,x2,y2)
+% LOC_STIFF computes the local stiffness matrix of a 2D truss element from
+% node (x1,y1) to node (x2,y2).
+
+% Determine sine and cosine value based on the element's inclination
+L = sqrt((x2-x1)^2+ (y2-y1)^2); % Element length
+c = (x2-x1)/L; % cosine of this specific element
+s = (y2-y1)/L; % sine of this specific element
+
+% Solve local stiffness matrix
+k =   (E*A/L)* [ c^2  s*c -c^2 -s*c ;
+                 s*c  s^2 -s*c -s^2 ;   
+                -c^2 -s*c  c^2  s*c ;
+                -s*c -s^2  s*c  s^2  ];
