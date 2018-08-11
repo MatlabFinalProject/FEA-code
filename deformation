@@ -1,0 +1,12 @@
+function B = deformation(x1,y1,x2,y2)
+% DEFORMATION calculates the deformation matrix of a 2D truss element with nodes
+% at (x1,y1) and (x2,y2).
+
+% Define line length, cosine and sine of the function
+
+L = sqrt((x2-x1)^2+ (y2-y1)^2); % Element length
+c = (x2-x1)/L; % cosine of this specific element
+s = (y2-y1)/L; % sine of this specific element
+
+% Compute 
+B = 1/L*[-c -s c s];
