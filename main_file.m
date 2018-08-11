@@ -69,22 +69,71 @@ d = zeros(dof,1);
 % Calculate local stiffness matrices at each element and input them into
 % global stiffness matrix 
 for ii=1:ne
+% INITIAL SETUP
+    % Determine the nodes' index
+    n1 = conn(ii,1);
+    n2 = conn(ii,2);
+    % Determine x y coordinate of the two nodes
+    x1 = nodes(n1,1); y1 = nodes(n2,2);
+    x2 = nodes(n1+1,1); y2 = nodes(n2+1,2);
+    
+% Compute local stiffness matrix
+    kii = loc_stiff(E,A,x1,y1,x2,y2);
+    
+% Scatter local stiffness matrix into global matrix
+    % Determine where in the global stiffness matrix the local matrix goes
+    sctr = [2*n1-1 2*n1 2*n2-1 2*n2];
+    % Scatter local stiffness matrix into global stiffness matrix
+    K(sctr,sctr)= K(sctr,sctr)+kii;
+end
+
+% Solve for displacement
+d(free) = K(free)\load(free);
+
+% Re-structure d into normal displacement
+u = d(1:2:end);
+v = d(2:2:end);
+% --------------------------------
+
+% POST PROCESSING 
+
+% Calculate stress and strain
+for ii=1:ne
     n1 = conn(ii,1);
     n2 = conn(ii,2);
     
     % Determine x y coordinate of the two nodes
     x1 = nodes(n1,1); y1 = nodes(n2,2);
     x2 = nodes(n1+1,1); y2 = nodes(n2+1,2);
-    kii = loc_stiff(E,A,L,x1,y1,x2,y2);
     
-    % Scatter local stiffness matrix into global matrix
-    K = loc2glob(kii,n1,n2);
-
+    % Calculate the deformation matrix
+    B = deformation(x1,y1,x2,y2);
+    
+    % Calculate stress and strain
+    sctr = [2*n1-1 2*n1 2*n2-1 2*n2];
+    strain = B*d(sctr);
+    stress = strain*E;
 end
-% Solve for displacement
-d(free) = K(free)\load(free);
-% --------------------------------
 
-% POST PROCESSING 
+% Plot original and deformed trusses
+figure
+plot(node(:,1),node(:,2),'o')
+hold on
+plot(node_new(:,1),node_new(:,2),'or')
 
-% (to be done)
+for ii=1:ne
+    n1 = conn(ii,1);
+    n2 = conn(ii,2);
+    
+    x1 = nodes(n1,1); y1 = nodes(n1,2);
+    x2 = nodes(n2,1); y2 = nodes(n2,2);
+    
+    plot([x1 x2],[y1 y2],'b')
+    
+    x1n = nodes_new(n1,1); y1n = nodes_new(n1,2);
+    x2n = nodes_new(n2,1); y2n = nodes_new(n2,2);
+
+    plot([x1n x2n], [y1n y2n], 'r')
+end
+
+    
