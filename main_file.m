@@ -80,28 +80,24 @@ free(:,fixture) = [];
 % PROCESSING
 
 % Create global stiffness matrix
-K = zeros(dof);
+K = sparse(dof,dof);
 % Create displacement vector
 d = zeros(dof,1);
-% Calculate local stiffness matrices at each element and input them into
-% global stiffness matrix 
-for ii=1:ne
-% INITIAL SETUP
-    % Determine the nodes' index
-    n1 = conn(ii,1);
-    n2 = conn(ii,2);
-    % Determine x y coordinate of the two nodes
-    x1 = node(n1,1); y1 = node(n1,2);
-    x2 = node(n2,1); y2 = node(n2,2);
-    
-% Compute local stiffness matrix
-    kii = loc_stiff_t(E,A,x1,y1,x2,y2);
-    
-% Scatter local stiffness matrix into global matrix
-    % Determine where in the global stiffness matrix the local matrix goes
-    sctr = [2*n1-1 2*n1 2*n2-1 2*n2];
-    % Scatter local stiffness matrix into global stiffness matrix
-    K(sctr,sctr)= K(sctr,sctr)+kii;
+
+
+% JACK CHESSA QUOTE, NEED TO REPLACE
+% assemble K
+K=sparse(ndof,ndof);
+for e=1:ne % loop over the elements
+  
+  conne=conn(e,:);  % element connectivity 
+  
+  % local stiffness matrix
+  ke = kmat_truss2d_JACK( node( conne,: ), Ae(e)*Ee(e) );  
+  
+  sctr=[ 2*conne(1)-1 2*conne(1) 2*conne(2)-1 2*conne(2) ];
+  K(sctr,sctr) =  K(sctr,sctr) + ke;  % scatter ke into K
+  
 end
 
 % Solve for displacement
@@ -114,6 +110,8 @@ v = d(2:2:end);
 % Create new matrix describing the new position of the nodes after force is
 % applied
 node_new = [node(:,1)+200*u, node(:,2)+200*v];
+node_newx = node_new(:,1);
+node_newy = node_new(:,2);
 
 % --------------------------------
 
@@ -186,17 +184,17 @@ end
 % Plot the deformed shape with color
 figure
 switch material
-    case 'Aluminum'
+    case 'aluminum'
         bound = boundary(node_newx,node_newy);
         C = [0.4 0.4 0.4];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
-    case 'Copper'
+    case 'copper'
         bound = boundary(node_newx,node_newy);
         C = [0.8 0.5 0.2];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
-    case 'Steel'
+    case 'steel'
         bound = boundary(node_newx,node_newy);
         C = [0.27 0.30 0.35];
         graph = fill(node_newx(bound),node_newy(bound),C);
