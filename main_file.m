@@ -1,57 +1,50 @@
 % [Main file] FEA analysis beam bending
 
-% USER INPUTS
+% Define nodal coordinate matrix
+node=[0.0 0.0; 
+      1.0 0.0; 
+      2.0 0.0; 
+      3.0 0.0; 
+      2.5 1.0;
+      1.5 1.0; 
+      0.5 1.0];
+  
+nodex = node(:,1); % x component of nodes
+nodey = node(:,2); % y component of nodes
+  
+ % Define connectivity matrix
+ conn=[1 2;
+       2 3;
+       3 4;
+       7 6;
+       6 5;
+       1 7;
+       7 2;
+       2 6;
+       6 3;
+       3 5;
+       5 4 ]; 
 
-% Input dimensions of beam 
-l = input('What is the length of your beam? (in feet)');
-w = input('What is the width of your beam? (in feet)');
-if isnumeric(l) == 0 || isnumeric(w) == 0
-    error('Input must be a numerical value')
-end 
-
-% Specify tolerance
-tol = input('About how long do you want each basic element to be?');
-
+% USER INPUT 
 % Specify material properties
-% "Aluminum"
-% "Copper"
-% "Steel"
+
 material = input('What is the material of the beam?');
 
 % Apply boundary conditions 
 % Fixtures
-fx = input('Specifiy the range of x dimension over which the material will be fixed');
-fy = input('Specifiy the range of y dimension over which the material will be fixed');
 % Loads
-ff = input('Specifiy the range of x y dimensions over which the force will be applied');
-fn = input('Specify the force in newtons');
 
+force = input('How much force do you want to apply to the system?');
+location = input('At which node?');
+fixture = input('Which nodes do you want to fix?');
 
 % --------------------------------
 
 % PREPROCESSING: TRANSLATING THE USER INPUT INTO FEA DATA
 
-% Determine how many nodes we need (nn) base on tolerance
-nl = ceil(l/tol); % on x axis
-nw = ceil(w/tol); % on y axis
-
-% Create nodes matrix
-nodes = zeros((nl+1)*(nw+1), 2);
-numCol = 1;
-for ii = 1:nw+1 
-    for jj = 1:tol:(l+1)
-        nodes(numCol, 1) = jj-1; % first column
-        numCol = numCol + 1;
-    end
-    nodes(numCol-(nl+1):numCol-1, 2) = tol*(ii-1); % second column
-end
-
 % Determine degrees of freedom based on number of nodes
-nn = size(nodes, 1);
-dof = ;
-
-% Create connectivity matrix
-conn = ;
+nn = size(node, 1);
+dof = 2*nn;
 
 % Determine number of elements based on connectivity matrix
 ne = length(conn);
@@ -59,26 +52,28 @@ ne = length(conn);
 % Define material properties 
 % E = "Young's Modulus" (in gigapascals)
     % determines the stiffness of the structure in response to applied loads
-% A = "Cross sectional area of each element"
-if material == 'aluminum'
+% A = "Cross sectional area of each element". In this case, the cross sectional area is assumed to be 2 
+
+switch material
+    case 'aluminum'
     E = 69;
-    A = ;
-elseif material == 'copper'
+    A = 2;
+    case 'copper'
     E = 128;
-    A = ;
-elseif material == 'steel'
+    A = 2;
+    case 'steel'
     E = 200;
-    A = ;
+    A = 2;
 end
 
+% Determine how much force is applied
+f = zeros(dof,1);
+f(location) = force;
 
+% Determine which nodes are free
+free = 1:dof;
+free(:,fixture) = [];
 
-% Define boundary conditions
-% According to the fixtures, which nodes are constrained? which nodes have
-% forces acting on them?
-free = ;
-fixed = ;
-load = ;
 
 % --------------------------------
 
@@ -96,11 +91,11 @@ for ii=1:ne
     n1 = conn(ii,1);
     n2 = conn(ii,2);
     % Determine x y coordinate of the two nodes
-    x1 = nodes(n1,1); y1 = nodes(n2,2);
-    x2 = nodes(n1+1,1); y2 = nodes(n2+1,2);
+    x1 = node(n1,1); y1 = node(n1,2);
+    x2 = node(n2,1); y2 = node(n2,2);
     
 % Compute local stiffness matrix
-    kii = loc_stiff(E,A,x1,y1,x2,y2);
+    kii = loc_stiff_t(E,A,x1,y1,x2,y2);
     
 % Scatter local stiffness matrix into global matrix
     % Determine where in the global stiffness matrix the local matrix goes
@@ -110,7 +105,7 @@ for ii=1:ne
 end
 
 % Solve for displacement
-d(free) = K(free)\load(free);
+d(free) = K(free,free)\f(free);
 
 % Re-structure d into normal displacement
 u = d(1:2:end);
@@ -141,11 +136,11 @@ for ii=1:ne
     n2 = conn(ii,2);
     
     % Determine x y coordinate of the two nodes
-    x1 = nodes(n1,1); y1 = nodes(n2,2);
-    x2 = nodes(n1+1,1); y2 = nodes(n2+1,2);
+    x1 = node(n1,1); y1 = node(n1,2);
+    x2 = node(n2,1); y2 = node(n2,2);
     
     % Calculate the deformation matrix
-    B = deformation(x1,y1,x2,y2);
+    B = deformation_t(x1,y1,x2,y2);
     
     % Calculate stress and strain at elements
     sctr = [2*n1-1 2*n1 2*n2-1 2*n2];
@@ -168,7 +163,7 @@ end
 
 % Plot the system 
 figure
-plot(node(:,1),node(:,2),'o')
+plot(nodex,nodey,'o')
 hold on
 plot(node_new(:,1),node_new(:,2),'or')
 
@@ -212,4 +207,5 @@ end
 figure
 patch(nodex,nodey,stress_node)
 colorbar
+axis equal
     
