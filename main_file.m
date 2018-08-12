@@ -28,15 +28,18 @@ nodey = node(:,2); % y component of nodes
 % USER INPUT 
 % Specify material properties
 
-material = input('What is the material of the beam?');
-
+materialCell = inputdlg('What is the material of the beam?', 'Material');
+material = materialCell{1};
 % Apply boundary conditions 
 % Fixtures
 % Loads
 
-force = input('How much force do you want to apply to the system?');
-location = input('At which node?');
-fixture = input('Which nodes do you want to fix?');
+forceCell = inputdlg ('How much force do you want to apply to the system?');
+force = forceCell{1};
+locationCell = inputdlg('At which node?');
+location = locationCell{1};
+fixtureCell = inputdlg('Which nodes do you want to fix?');
+fixture = fixtureCell{1};
 
 % --------------------------------
 
@@ -53,15 +56,14 @@ ne = length(conn);
 % E = "Young's Modulus" (in gigapascals)
     % determines the stiffness of the structure in response to applied loads
 % A = "Cross sectional area of each element". In this case, the cross sectional area is assumed to be 2 
-
-switch material
-    case 'aluminum'
+% i'm changing to if because switch isn't working
+if material ==  'aluminum'
     E = 69;
     A = 2;
-    case 'copper'
+elseif material == 'copper'
     E = 128;
     A = 2;
-    case 'steel'
+elseif material ==  'steel'
     E = 200;
     A = 2;
 end
@@ -206,4 +208,3 @@ figure
 patch(nodex,nodey,stress_node)
 colorbar
 axis equal
-    
