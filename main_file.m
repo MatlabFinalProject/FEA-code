@@ -32,24 +32,46 @@ fn = input('Specify the force in newtons');
 % PREPROCESSING: TRANSLATING THE USER INPUT INTO FEA DATA
 
 % Determine how many nodes we need (nn) base on tolerance
-nl = ceil(l/tol);
-nw = ceil(w/tol);
+nl = ceil(l/tol); % on x axis
+nw = ceil(w/tol); % on y axis
+
 % Create nodes matrix
-nodes = [];
+nodes = zeros((nl+1)*(nw+1), 2);
+numCol = 1;
+for ii = 1:nw+1 
+    for jj = 1:tol:(l+1)
+        nodes(numCol, 1) = jj-1; % first column
+        numCol = numCol + 1;
+    end
+    nodes(numCol-(nl+1):numCol-1, 2) = tol*(ii-1); % second column
+end
 
 % Determine degrees of freedom based on number of nodes
+nn = size(nodes, 1);
 dof = ;
 
 % Create connectivity matrix
 conn = ;
-% Determine number of elements based on connectivity matrix
-ne = ;
 
-% Define material propertieis 
-% E = "Young's Modulus"
+% Determine number of elements based on connectivity matrix
+ne = length(conn);
+
+% Define material properties 
+% E = "Young's Modulus" (in gigapascals)
+    % determines the stiffness of the structure in response to applied loads
 % A = "Cross sectional area of each element"
-E = ;
-A = ;
+if material == 'aluminum'
+    E = 69;
+    A = ;
+elseif material == 'copper'
+    E = 128;
+    A = ;
+elseif material == 'steel'
+    E = 200;
+    A = ;
+end
+
+
 
 % Define boundary conditions
 % According to the fixtures, which nodes are constrained? which nodes have
@@ -103,6 +125,17 @@ node_new = [node(:,1)+200*u, node(:,2)+200*v];
 % POST PROCESSING 
 
 % Calculate stress and strain
+
+% Define vectors that store the stress and strain values
+strain = zeros(ne,1);
+stress = zeros(ne,1);
+
+% Define vectors that store nodal stress for eah node 
+for ii=1:nn
+    name = ['stress_node',num2str(ii),'= [];'];
+    eval(name)
+end
+
 for ii=1:ne
     n1 = conn(ii,1);
     n2 = conn(ii,2);
@@ -114,13 +147,26 @@ for ii=1:ne
     % Calculate the deformation matrix
     B = deformation(x1,y1,x2,y2);
     
-    % Calculate stress and strain
+    % Calculate stress and strain at elements
     sctr = [2*n1-1 2*n1 2*n2-1 2*n2];
-    strain = B*d(sctr);
-    stress = strain*E;
+    strain(ii) = B*d(sctr);
+    stress(ii) = strain(ii)*E;
+    
+    % Calculate stress at individual nodes (assuming each node shares the
+    % stress equally)
+    eval(['stress_node',num2str(n1),'= [', 'stress_node',num2str(n1), ', stress(ii) ];'])
+    eval(['stress_node',num2str(n2),'= [', 'stress_node',num2str(n2), ', stress(ii) ];'])
+    
 end
 
-% Plot original and deformed trusses
+% Calculate final nodal stress
+stress_node = [];
+for ii =1:nn
+    eval(['k = mean(','stress_node',num2str(ii), ');'])
+    stress_node = [stress_node; k];
+end
+
+% Plot the system 
 figure
 plot(node(:,1),node(:,2),'o')
 hold on
@@ -130,15 +176,40 @@ for ii=1:ne
     n1 = conn(ii,1);
     n2 = conn(ii,2);
     
-    x1 = nodes(n1,1); y1 = nodes(n1,2);
-    x2 = nodes(n2,1); y2 = nodes(n2,2);
+    x1 = node(n1,1); y1 = node(n1,2);
+    x2 = node(n2,1); y2 = node(n2,2);
     
-    plot([x1 x2],[y1 y2],'b')
+    plot([x1 x2],[y1 y2],'b--')
     
-    x1n = nodes_new(n1,1); y1n = nodes_new(n1,2);
-    x2n = nodes_new(n2,1); y2n = nodes_new(n2,2);
+    x1n = node_new(n1,1); y1n = node_new(n1,2);
+    x2n = node_new(n2,1); y2n = node_new(n2,2);
 
     plot([x1n x2n], [y1n y2n], 'r')
+    axis equal
 end
 
+% Plot the deformed shape with color
+figure
+switch material
+    case 'Aluminum'
+        bound = boundary(node_newx,node_newy);
+        C = [0.4 0.4 0.4];
+        graph = fill(node_newx(bound),node_newy(bound),C);
+        axis equal
+    case 'Copper'
+        bound = boundary(node_newx,node_newy);
+        C = [0.8 0.5 0.2];
+        graph = fill(node_newx(bound),node_newy(bound),C);
+        axis equal
+    case 'Steel'
+        bound = boundary(node_newx,node_newy);
+        C = [0.27 0.30 0.35];
+        graph = fill(node_newx(bound),node_newy(bound),C);
+        axis equal
+end
+
+% Plot nodal stress diagram
+figure
+patch(nodex,nodey,stress_node)
+colorbar
     
