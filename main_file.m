@@ -28,18 +28,15 @@ nodey = node(:,2); % y component of nodes
 % USER INPUT 
 % Specify material properties
 
-materialCell = inputdlg('What is the material of the beam?', 'Material');
-material = materialCell{1};
+material = input('What is the material of the beam?');
+
 % Apply boundary conditions 
 % Fixtures
 % Loads
 
-forceCell = inputdlg ('How much force do you want to apply to the system?');
-force = forceCell{1};
-locationCell = inputdlg('At which node?');
-location = locationCell{1};
-fixtureCell = inputdlg('Which nodes do you want to fix?');
-fixture = fixtureCell{1};
+force = input('How much force do you want to apply to the system?');
+location = input('At which node?');
+fixture = input('Which nodes do you want to fix?');
 
 % --------------------------------
 
@@ -56,14 +53,15 @@ ne = length(conn);
 % E = "Young's Modulus" (in gigapascals)
     % determines the stiffness of the structure in response to applied loads
 % A = "Cross sectional area of each element". In this case, the cross sectional area is assumed to be 2 
-% i'm changing to if because switch isn't working
-if material ==  'aluminum'
+
+switch material
+    case 'aluminum'
     E = 69;
     A = 2;
-elseif material == 'copper'
+    case 'copper'
     E = 128;
     A = 2;
-elseif material ==  'steel'
+    case 'steel'
     E = 200;
     A = 2;
 end
@@ -82,24 +80,28 @@ free(:,fixture) = [];
 % PROCESSING
 
 % Create global stiffness matrix
-K = sparse(dof,dof);
+K = zeros(dof);
 % Create displacement vector
 d = zeros(dof,1);
 
-
-% JACK CHESSA QUOTE, NEED TO REPLACE
-% assemble K
-K=sparse(ndof,ndof);
-for e=1:ne % loop over the elements
-  
-  conne=conn(e,:);  % element connectivity 
-  
-  % local stiffness matrix
-  ke = kmat_truss2d_JACK( node( conne,: ), Ae(e)*Ee(e) );  
-  
-  sctr=[ 2*conne(1)-1 2*conne(1) 2*conne(2)-1 2*conne(2) ];
-  K(sctr,sctr) =  K(sctr,sctr) + ke;  % scatter ke into K
-  
+% Calculate local stiffness matrices at each element and input them into
+% global stiffness matrix 
+for ii=1:ne
+    % Determine the nodes' index
+    n1 = conn(ii,1);
+    n2 = conn(ii,2);
+    % Determine x y coordinate of the two nodes
+    x1 = node(n1,1); y1 = node(n1,2);
+    x2 = node(n2,1); y2 = node(n2,2);
+    
+% Compute local stiffness matrix
+    kii = loc_stiff_t(E,A,x1,y1,x2,y2);
+    
+% Scatter local stiffness matrix into global matrix
+    % Determine where in the global stiffness matrix the local matrix goes
+    sctr = [2*n1-1 2*n1 2*n2-1 2*n2];
+    % Scatter local stiffness matrix into global stiffness matrix
+    K(sctr,sctr)= K(sctr,sctr)+kii;
 end
 
 % Solve for displacement
@@ -111,9 +113,10 @@ v = d(2:2:end);
 
 % Create new matrix describing the new position of the nodes after force is
 % applied
-node_new = [node(:,1)+200*u, node(:,2)+200*v];
+node_new = [node(:,1)+u, node(:,2)+v];
 node_newx = node_new(:,1);
 node_newy = node_new(:,2);
+
 
 % --------------------------------
 
@@ -208,3 +211,4 @@ figure
 patch(nodex,nodey,stress_node)
 colorbar
 axis equal
+    
