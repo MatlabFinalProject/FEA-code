@@ -1,5 +1,5 @@
 % [Main file] FEA analysis beam bending
-
+close all; clear; clc
 % Define nodal coordinate matrix
 node=[0.0 0.0; 
       1.0 0.0; 
@@ -27,16 +27,19 @@ nodey = node(:,2); % y component of nodes
 
 % USER INPUT 
 % Specify material properties
-
-material = input('What is the material of the beam?');
+materialCell = inputdlg('What is the material of the beam?'); % don't need ' ' for this
+material = materialCell{1};
 
 % Apply boundary conditions 
 % Fixtures
 % Loads
 
-force = input('How much force do you want to apply to the system?');
-location = input('At which node?');
-fixture = input('Which nodes do you want to fix?');
+forceCell = inputdlg('How much force do you want to apply to the system?');
+force = str2num(forceCell{1});
+locationCell = inputdlg('At which node?');
+location = str2num(locationCell{1});
+fixtureCell = inputdlg('Which nodes do you want to fix?');
+fixture = str2num(fixtureCell{1});
 
 % --------------------------------
 
@@ -170,6 +173,7 @@ plot(nodex,nodey,'o')
 hold on
 plot(node_new(:,1),node_new(:,2),'or')
 
+
 for ii=1:ne
     n1 = conn(ii,1);
     n2 = conn(ii,2);
@@ -185,6 +189,7 @@ for ii=1:ne
     plot([x1n x2n], [y1n y2n], 'r')
     axis equal
 end
+title('Original Truss and Truss with Deformation'); xlabel('x nodes'); ylabel('y nodes'); legend('original', 'deformed');
 
 % Plot the deformed shape with color
 figure
@@ -205,10 +210,12 @@ switch material
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
 end
+title('Deformed Truss');  xlabel('x nodes'); ylabel('y nodes'); legend(material);
 
 % Plot nodal stress diagram
 figure
 patch(nodex,nodey,stress_node)
-colorbar
+cb = colorbar; title(cb, 'stress');
 axis equal
+title('Nodal Stress Diagram with Color');  xlabel('x nodes'); ylabel('y nodes');
     
