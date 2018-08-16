@@ -59,7 +59,7 @@ material = menu('What is the material of the beam?','Aluminum','Copper','Steel')
 
 % Specify cross sectional area
 crossCell = inputdlg('What is the cross section area of your trusses'); % don't need ' ' for this
-cross = crossCell{1};
+cross = num2str(crossCell{1});
 
 % -------------------------------------------------------------------------------
 % PREPROCESSING: TRANSLATING THE SETUP DATA AND USER INPUT DATA INTO FEA DATA    | 
@@ -77,16 +77,14 @@ ne = length(conn);
     % determines the stiffness of the structure in response to applied loads
 % A = "Cross sectional area of each element". In this case, the cross sectional area is assumed to be 2 
 
+A = cross;
 switch material
     case 1 % That is, the user chose aluminum in the dialogue box
     E = 69;
-    A = 2;
     case 2 % That is, the user chose copper in the dialogue box
     E = 128;
-    A = 2;
     case 3 % That is, the user chose steel in the dialogye box
     E = 200;
-    A = 2;
 end
 
 % Determine how much force is applied
