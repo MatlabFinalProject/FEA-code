@@ -1,13 +1,21 @@
 function fixture_interactive_t(node,conn)
+% FORCE_INTERACTIVE_T displays an interactive image for users to specify
+% the nodes of the 2D Truss Structure they want to fix while performing the
+% Finite Element Analysis. Used with main_file_t.
+% node = the nodal coordinates of the truss
+% conn = the connectivity matrix of truss
 
+% Define necessary variables
 nodex = node(:,1); % x component of nodes
 nodey = node(:,2); % y component of nodes
 ne = length(conn); % number of elements
 nn = size(node, 1); % number of nodes
 dof = 2*nn; % degree of freedom
 
+% Initialize variable to return
+fixture = [];
 
-% Show a figure  
+% Show the interactive figure 
 figure
 plot(nodex,nodey,'o')
 hold on
@@ -25,6 +33,8 @@ for ii=1:ne
     set(t,'FontSize',20)
 end
 
+% Create pushbuttons for all seven nodes using uicontrol() and assign
+% callback functions to each button.
 fix7 = uicontrol('style','pushbutton');
 set(fix7,'position', [100 300, 70, 20]);
 set(fix7,'string','Fix this node!');
@@ -60,10 +70,7 @@ set(fix1,'position', [30 115, 70, 20]);
 set(fix1,'string','Fix this node!');
 set(fix1,'callback',{@set_fix1})
 
-% Initialize variable to return
-fixture = [];
-
-
+% Set up callback functions: if a button is clicked, the node is fixed.
 function set_fix1(fix1, ~) 
 if get(fix1,'value')
     set(fix1,'string','Fixed!')
@@ -147,6 +154,5 @@ else
 end
 assignin('base','fixture',fixture)
 end
-
 
 end
