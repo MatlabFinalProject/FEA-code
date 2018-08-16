@@ -26,6 +26,7 @@
 close all; clear; clc
 
 % SETUP
+% Truss is in meters
 
 % Define nodal coordinate matrix
 node=[0.0 0.0; 
@@ -58,7 +59,7 @@ nodey = node(:,2); % y component of nodes
 material = menu('What is the material of the beam?','Aluminum','Copper','Steel'); % don't need ' ' for this
 
 % Specify cross sectional area
-crossCell = inputdlg('What is the cross section area of your trusses'); % don't need ' ' for this
+crossCell = inputdlg('What is the cross section area of your trusses (m^2)'); % don't need ' ' for this
 cross = crossCell{1};
 
 % -------------------------------------------------------------------------------
@@ -216,7 +217,7 @@ for ii=1:ne
     plot([x1n x2n], [y1n y2n], 'r')
     axis equal
 end
-title('Original Truss and Truss with Deformation'); xlabel('x nodes'); ylabel('y nodes'); legend('original', 'deformed');
+title('Original Truss and Truss with Deformation'); xlabel('x nodes (m)'); ylabel('y nodes (m)'); legend('original', 'deformed');
 
 % Plot the deformed shape with color
 figure
@@ -240,11 +241,16 @@ switch material
         axis equal
         legend('Steel')
 end
-title('Deformed Truss');  xlabel('x nodes'); ylabel('y nodes');
+title('Deformed Truss'); xlabel('x nodes (m)'); ylabel('y nodes (m)');
 
 % Plot nodal stress diagram
 figure
 patch(nodex,nodey,stress_node)
 cb = colorbar; title(cb, 'stress');
 axis equal
-title('Nodal Stress Diagram with Color');  xlabel('x nodes'); ylabel('y nodes');
+title('Nodal Stress Diagram with Color');  xlabel('x nodes (m)'); ylabel('y nodes (m)');
+
+% outputting the stress of each element
+for ii = 1:ne
+      fprintf('Element %d has a stress of %d (Pascals) \n', ii, stress(ii));
+end
