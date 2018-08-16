@@ -1,5 +1,32 @@
-% [Main file] FEA analysis beam bending
+% [Main file] 2D TrussFEA analysis
+% This MATLAB program analyzes how a simple 2D truss structure reacts to
+% various amount of external forces, using Finite Element Analysis. 
+% 
+% In the process of FEA, the following assumptions are made:
+% - Same young's modulus for tension and compression
+% - 
+%
+% Here are some limitations of the program: 
+% - Few material settings available (aluminum, copper, and steel only)
+% - Only able to analyze 2D Truss Structures (different elements have different
+%   stiffness matrices and deformation matrices
+% - 
+% ************************************************************************
+% Created by Anna Simmons and Justin Zhang. 
+% amsimmon@stanford.edu, jzhang09@stanford.edu
+% 
+% CEE 101S Summer 2018 Final Project                                  
+% MATLAB R2018a                                                       
+% -----------------------------------------------------------------------------
+
+% ----------------------------------------------------------------------------------
+% SETUP & USER INPUT: DEFINING THE TRUSS STRUCTURE/ASKING USERS FOR SPECIFICATIONS  | 
+% ----------------------------------------------------------------------------------
+
 close all; clear; clc
+
+% SETUP
+
 % Define nodal coordinate matrix
 node=[0.0 0.0; 
       1.0 0.0; 
@@ -26,6 +53,7 @@ nodey = node(:,2); % y component of nodes
        5 4 ]; 
 
 % USER INPUT 
+
 % Specify material properties
 material = menu('What is the material of the beam?','Aluminum','Copper','Steel'); % don't need ' ' for this
 
@@ -33,9 +61,9 @@ material = menu('What is the material of the beam?','Aluminum','Copper','Steel')
 crossCell = inputdlg('What is the cross section area of your trusses'); % don't need ' ' for this
 cross = crossCell{1};
 
-% --------------------------------
-
-% PREPROCESSING: TRANSLATING THE USER INPUT INTO FEA DATA
+% -------------------------------------------------------------------------------
+% PREPROCESSING: TRANSLATING THE SETUP DATA AND USER INPUT DATA INTO FEA DATA    | 
+% -------------------------------------------------------------------------------
 
 % Determine degrees of freedom based on number of nodes
 nn = size(node, 1);
@@ -74,9 +102,9 @@ pause
 free = 1:dof;
 free(:,fixture) = [];
 
-% --------------------------------
-
-% PROCESSING
+% ----------------------------------------------------------------------------------------------
+% PROCESSING: COMPUTING THE DISPLACEMENT OF TRUSS UNDER STRESS USING THEDIRECT STIFFNESS METHOD |
+% ----------------------------------------------------------------------------------------------
 
 % Create global stiffness matrix
 K = zeros(dof);
@@ -117,9 +145,9 @@ node_newx = node_new(:,1);
 node_newy = node_new(:,2);
 
 
-% --------------------------------
-
-% POST PROCESSING 
+% ------------------------------------------------------------------------------
+% POSTPROCESSING: PLOTTING & CALCULATING THE STRESS AND STRAIN OF THE STRUCTURE |
+% ------------------------------------------------------------------------------
 
 % Calculate stress and strain
 
@@ -163,6 +191,9 @@ for ii =1:nn
     stress_node = [stress_node; k];
 end
 
+% Display the stress and strain 
+fprintf('ELEMENT        STRESS        STRAIN')
+
 % Plot the system 
 figure
 plot(nodex,nodey,'o')
@@ -191,19 +222,19 @@ title('Original Truss and Truss with Deformation'); xlabel('x nodes'); ylabel('y
 figure
 switch material
     case 1 % aluminum
-        bound = boundary(node_newx,node_newy);
+        bound = boundary(node_newx,node_newy,1);
         C = [0.7 0.7 0.7];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
         legend('Aluminum')
     case 2 % copper
-        bound = boundary(node_newx,node_newy);
+        bound = boundary(node_newx,node_newy,1);
         C = [0.8 0.5 0.2];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
         legend('Copper')
     case 3 % steel
-        bound = boundary(node_newx,node_newy);
+        bound = boundary(node_newx,node_newy,1);
         C = [0.27 0.30 0.35];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
