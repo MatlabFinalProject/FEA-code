@@ -81,13 +81,13 @@ ne = length(conn);
 switch material
     case 1 % That is, the user chose aluminum in the dialogue box
     E = 69;
-    A = 2;
+    A = cross;
     case 2 % That is, the user chose copper in the dialogue box
     E = 128;
-    A = 2;
+    A = cross;
     case 3 % That is, the user chose steel in the dialogye box
     E = 200;
-    A = 2;
+    A = cross;
 end
 
 % Determine how much force is applied
