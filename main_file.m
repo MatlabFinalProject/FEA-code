@@ -26,7 +26,6 @@
 close all; clear; clc
 
 % SETUP
-% Truss is in meters
 
 % Define nodal coordinate matrix
 node=[0.0 0.0; 
@@ -59,8 +58,8 @@ nodey = node(:,2); % y component of nodes
 material = menu('What is the material of the beam?','Aluminum','Copper','Steel'); % don't need ' ' for this
 
 % Specify cross sectional area
-crossCell = inputdlg('What is the cross sectional area of your trusses (m^2)'); % don't need ' ' for this
-cross = num2str(crossCell{1});
+crossCell = inputdlg('What is the cross section area of your trusses'); % don't need ' ' for this
+cross = crossCell{1};
 
 % -------------------------------------------------------------------------------
 % PREPROCESSING: TRANSLATING THE SETUP DATA AND USER INPUT DATA INTO FEA DATA    | 
@@ -78,14 +77,16 @@ ne = length(conn);
     % determines the stiffness of the structure in response to applied loads
 % A = "Cross sectional area of each element". In this case, the cross sectional area is assumed to be 2 
 
-A = cross;
 switch material
     case 1 % That is, the user chose aluminum in the dialogue box
     E = 69;
+    A = 2;
     case 2 % That is, the user chose copper in the dialogue box
     E = 128;
+    A = 2;
     case 3 % That is, the user chose steel in the dialogye box
     E = 200;
+    A = 2;
 end
 
 % Determine how much force is applied
@@ -100,6 +101,7 @@ pause
 % Determine which nodes are free
 free = 1:dof;
 free(:,fixture) = [];
+
 
 % ----------------------------------------------------------------------------------------------
 % PROCESSING: COMPUTING THE DISPLACEMENT OF TRUSS UNDER STRESS USING THEDIRECT STIFFNESS METHOD |
@@ -148,6 +150,7 @@ node_newy = node_new(:,2);
 % POSTPROCESSING: PLOTTING & CALCULATING THE STRESS AND STRAIN OF THE STRUCTURE |
 % ------------------------------------------------------------------------------
 
+
 % Calculate stress and strain
 
 % Define vectors that store the stress and strain values
@@ -176,7 +179,7 @@ for ii=1:ne
     strain(ii) = B*d(sctr);
     stress(ii) = strain(ii)*E;
     
-    % Calculate stress (Pascal) at individual nodes (assuming each node shares the
+    % Calculate stress at individual nodes (assuming each node shares the
     % stress equally)
     eval(['stress_node',num2str(n1),'= [', 'stress_node',num2str(n1), ', stress(ii) ];'])
     eval(['stress_node',num2str(n2),'= [', 'stress_node',num2str(n2), ', stress(ii) ];'])
@@ -190,8 +193,6 @@ for ii =1:nn
     stress_node = [stress_node; k];
 end
 
-% Display the stress and strain 
-fprintf('ELEMENT        STRESS        STRAIN')
 
 % Plot the system 
 figure
@@ -215,35 +216,35 @@ for ii=1:ne
     plot([x1n x2n], [y1n y2n], 'r')
     axis equal
 end
-title('Original Truss and Truss with Deformation'); xlabel('x nodes (m)'); ylabel('y nodes (m)'); legend('original', 'deformed');
+title('Original Truss and Truss with Deformation'); xlabel('x nodes'); ylabel('y nodes'); legend('original', 'deformed');
 
 % Plot the deformed shape with color
 figure
 switch material
     case 1 % aluminum
-        bound = boundary(node_newx,node_newy,1);
+        bound = boundary(node_newx,node_newy);
         C = [0.7 0.7 0.7];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
         legend('Aluminum')
     case 2 % copper
-        bound = boundary(node_newx,node_newy,1);
+        bound = boundary(node_newx,node_newy);
         C = [0.8 0.5 0.2];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
         legend('Copper')
     case 3 % steel
-        bound = boundary(node_newx,node_newy,1);
+        bound = boundary(node_newx,node_newy);
         C = [0.27 0.30 0.35];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
         legend('Steel')
 end
-title('Deformed Truss');  xlabel('x nodes (m)'); ylabel('y nodes (m)');
+title('Deformed Truss');  xlabel('x nodes'); ylabel('y nodes');
 
 % Plot nodal stress diagram
 figure
 patch(nodex,nodey,stress_node)
 cb = colorbar; title(cb, 'stress');
 axis equal
-title('Nodal Stress Diagram with Color');  xlabel('x nodes (m)'); ylabel('y nodes (m)');
+title('Nodal Stress Diagram with Color');  xlabel('x nodes'); ylabel('y nodes');
