@@ -27,19 +27,11 @@ nodey = node(:,2); % y component of nodes
 
 % USER INPUT 
 % Specify material properties
-materialCell = inputdlg('What is the material of the beam?'); % don't need ' ' for this
-material = materialCell{1};
+material = menu('What is the material of the beam?','Aluminum','Copper','Steel'); % don't need ' ' for this
 
-% Apply boundary conditions 
-% Fixtures
-% Loads
-
-forceCell = inputdlg('How much force do you want to apply to the system?');
-force = str2num(forceCell{1});
-locationCell = inputdlg('At which node?');
-location = str2num(locationCell{1});
-fixtureCell = inputdlg('Which nodes do you want to fix?');
-fixture = str2num(fixtureCell{1});
+% Specify cross sectional area
+crossCell = inputdlg('What is the cross section area of your trusses'); % don't need ' ' for this
+cross = crossCell{1};
 
 % --------------------------------
 
@@ -58,25 +50,29 @@ ne = length(conn);
 % A = "Cross sectional area of each element". In this case, the cross sectional area is assumed to be 2 
 
 switch material
-    case 'aluminum'
+    case 1 % That is, the user chose aluminum in the dialogue box
     E = 69;
     A = 2;
-    case 'copper'
+    case 2 % That is, the user chose copper in the dialogue box
     E = 128;
     A = 2;
-    case 'steel'
+    case 3 % That is, the user chose steel in the dialogye box
     E = 200;
     A = 2;
 end
 
 % Determine how much force is applied
-f = zeros(dof,1);
-f(location) = force;
+% Apply boundary conditions 
+force_interactive_t(node,conn); % specify force
+fprintf('Press any key to continue!\n')
+pause
+fixture_interactive_t(node,conn); % specify fixture
+fprintf('Press any key to continue!\n')
+pause
 
 % Determine which nodes are free
 free = 1:dof;
 free(:,fixture) = [];
-
 
 % --------------------------------
 
@@ -194,23 +190,26 @@ title('Original Truss and Truss with Deformation'); xlabel('x nodes'); ylabel('y
 % Plot the deformed shape with color
 figure
 switch material
-    case 'aluminum'
+    case 1 % aluminum
         bound = boundary(node_newx,node_newy);
-        C = [0.4 0.4 0.4];
+        C = [0.7 0.7 0.7];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
-    case 'copper'
+        legend('Aluminum')
+    case 2 % copper
         bound = boundary(node_newx,node_newy);
         C = [0.8 0.5 0.2];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
-    case 'steel'
+        legend('Copper')
+    case 3 % steel
         bound = boundary(node_newx,node_newy);
         C = [0.27 0.30 0.35];
         graph = fill(node_newx(bound),node_newy(bound),C);
         axis equal
+        legend('Steel')
 end
-title('Deformed Truss');  xlabel('x nodes'); ylabel('y nodes'); legend(material);
+title('Deformed Truss');  xlabel('x nodes'); ylabel('y nodes');
 
 % Plot nodal stress diagram
 figure
@@ -218,4 +217,3 @@ patch(nodex,nodey,stress_node)
 cb = colorbar; title(cb, 'stress');
 axis equal
 title('Nodal Stress Diagram with Color');  xlabel('x nodes'); ylabel('y nodes');
-    
