@@ -248,3 +248,8 @@ patch(nodex,nodey,stress_node)
 cb = colorbar; title(cb, 'stress');
 axis equal
 title('Nodal Stress Diagram with Color');  xlabel('x nodes (m)'); ylabel('y nodes (m)');
+
+for 1:ne
+      fprintf('Element %d has a stress of %f Pascals', ne, stress(ne));
+end
+      
