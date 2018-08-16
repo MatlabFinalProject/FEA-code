@@ -3,14 +3,14 @@
 % various amount of external forces, using Finite Element Analysis. 
 % 
 % In the process of FEA, the following assumptions are made:
-% - Same young's modulus for tension and compression
-% - 
+% - Same young's modulus for tension and compression 
 %
 % Here are some limitations of the program: 
 % - Few material settings available (aluminum, copper, and steel only)
 % - Only able to analyze 2D Truss Structures (different elements have different
 %   stiffness matrices and deformation matrices
-% - 
+% - The pushbuttons in the interactive figures made by uicontrol() are not
+%   fully developed. So it won't allow the user to "unfix" a node. 
 % ************************************************************************
 % Created by Anna Simmons and Justin Zhang. 
 % amsimmon@stanford.edu, jzhang09@stanford.edu
