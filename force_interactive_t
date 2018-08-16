@@ -1,5 +1,11 @@
 function force_interactive_t(node,conn)
+% FORCE_INTERACTIVE_T displays an interactive image for users to specify
+% the amount of force they want to exert on the 2D Truss Structure. Used
+% with main_file_t.
+% node = the nodal coordinates of the truss
+% conn = the connectivity matrix of truss
 
+% Define necessary variables 
 nodex = node(:,1); % x component of nodes
 nodey = node(:,2); % y component of nodes
 ne = length(conn); % number of elements
@@ -9,7 +15,7 @@ dof = 2*nn; % degree of freedom
 % Initialize variable to return
 f = zeros(dof,1);
 
-% Show a figure  
+% Plot the interactive figure  
 figure
 plot(nodex,nodey,'o')
 hold on
@@ -25,6 +31,8 @@ for ii=1:ne
     axis equal
 end
 
+% Define the push buttons using the uicontrol(), and assigning each of them 
+% a callback function
 force7 = uicontrol('style','pushbutton');
 set(force7,'position', [100 300, 70, 20]);
 set(force7,'string','Put force here!');
@@ -60,6 +68,7 @@ set(force1,'position', [30 115, 70, 20]);
 set(force1,'string','Put force here!');
 set(force1,'callback',{@set_force1})
 
+% Display the user interface when a button is pressed
 function set_force7(force7, ~) 
 if get(force7,'value')
     nid = 7;
