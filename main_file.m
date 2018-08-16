@@ -24,7 +24,7 @@
 % ----------------------------------------------------------------------------------
 
 close all; clear; clc
-
+% Truss is in meters
 % SETUP
 
 % Define nodal coordinate matrix
@@ -75,18 +75,18 @@ ne = length(conn);
 % Define material properties 
 % E = "Young's Modulus" (in gigapascals)
     % determines the stiffness of the structure in response to applied loads
-% A = "Cross sectional area of each element". In this case, the cross sectional area is assumed to be 2 
+% A = "Cross sectional area of each element" (m^2). In this case, the cross sectional area is assumed to be 2 
 
 switch material
     case 1 % That is, the user chose aluminum in the dialogue box
     E = 69;
-    A = 2;
+    A = cross;
     case 2 % That is, the user chose copper in the dialogue box
     E = 128;
-    A = 2;
+    A = cross;
     case 3 % That is, the user chose steel in the dialogye box
     E = 200;
-    A = 2;
+    A = cross;
 end
 
 % Determine how much force is applied
@@ -179,7 +179,7 @@ for ii=1:ne
     strain(ii) = B*d(sctr);
     stress(ii) = strain(ii)*E;
     
-    % Calculate stress at individual nodes (assuming each node shares the
+    % Calculate stress (Pascals) at individual nodes (assuming each node shares the
     % stress equally)
     eval(['stress_node',num2str(n1),'= [', 'stress_node',num2str(n1), ', stress(ii) ];'])
     eval(['stress_node',num2str(n2),'= [', 'stress_node',num2str(n2), ', stress(ii) ];'])
@@ -216,7 +216,7 @@ for ii=1:ne
     plot([x1n x2n], [y1n y2n], 'r')
     axis equal
 end
-title('Original Truss and Truss with Deformation'); xlabel('x nodes'); ylabel('y nodes'); legend('original', 'deformed');
+title('Original Truss and Truss with Deformation'); xlabel('x nodes (m)'); ylabel('y nodes (m)'); legend('original', 'deformed');
 
 % Plot the deformed shape with color
 figure
@@ -240,11 +240,11 @@ switch material
         axis equal
         legend('Steel')
 end
-title('Deformed Truss');  xlabel('x nodes'); ylabel('y nodes');
+title('Deformed Truss');  xlabel('x nodes (m)'); ylabel('y nodes (m)');
 
 % Plot nodal stress diagram
 figure
 patch(nodex,nodey,stress_node)
 cb = colorbar; title(cb, 'stress');
 axis equal
-title('Nodal Stress Diagram with Color');  xlabel('x nodes'); ylabel('y nodes');
+title('Nodal Stress Diagram with Color');  xlabel('x nodes (m)'); ylabel('y nodes (m)');
