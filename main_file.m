@@ -26,7 +26,7 @@
 close all; clear; clc
 
 % SETUP
-% Truss is in ft
+% Truss is in meters
 
 % Define nodal coordinate matrix
 node=[0.0 0.0; 
@@ -59,7 +59,7 @@ nodey = node(:,2); % y component of nodes
 material = menu('What is the material of the beam?','Aluminum','Copper','Steel'); % don't need ' ' for this
 
 % Specify cross sectional area
-crossCell = inputdlg('What is the cross sectional area of your trusses (ft^2)'); % don't need ' ' for this
+crossCell = inputdlg('What is the cross sectional area of your trusses (m^2)'); % don't need ' ' for this
 cross = num2str(crossCell{1});
 
 % -------------------------------------------------------------------------------
@@ -176,7 +176,7 @@ for ii=1:ne
     strain(ii) = B*d(sctr);
     stress(ii) = strain(ii)*E;
     
-    % Calculate stress at individual nodes (assuming each node shares the
+    % Calculate stress (Pascal) at individual nodes (assuming each node shares the
     % stress equally)
     eval(['stress_node',num2str(n1),'= [', 'stress_node',num2str(n1), ', stress(ii) ];'])
     eval(['stress_node',num2str(n2),'= [', 'stress_node',num2str(n2), ', stress(ii) ];'])
@@ -215,7 +215,7 @@ for ii=1:ne
     plot([x1n x2n], [y1n y2n], 'r')
     axis equal
 end
-title('Original Truss and Truss with Deformation'); xlabel('x nodes (ft)'); ylabel('y nodes (ft)'); legend('original', 'deformed');
+title('Original Truss and Truss with Deformation'); xlabel('x nodes (m)'); ylabel('y nodes (m)'); legend('original', 'deformed');
 
 % Plot the deformed shape with color
 figure
@@ -239,11 +239,11 @@ switch material
         axis equal
         legend('Steel')
 end
-title('Deformed Truss');  xlabel('x nodes (ft)'); ylabel('y nodes (ft)');
+title('Deformed Truss');  xlabel('x nodes (m)'); ylabel('y nodes (m)');
 
 % Plot nodal stress diagram
 figure
 patch(nodex,nodey,stress_node)
 cb = colorbar; title(cb, 'stress');
 axis equal
-title('Nodal Stress Diagram with Color');  xlabel('x nodes (ft)'); ylabel('y nodes (ft)');
+title('Nodal Stress Diagram with Color');  xlabel('x nodes (m)'); ylabel('y nodes (m)');
