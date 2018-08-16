@@ -1,0 +1,240 @@
+function force_interactive_t(node,conn)
+% FORCE_INTERACTIVE_T displays an interactive image for users to specify
+% the amount of force they want to exert on the 2D Truss Structure. Used
+% with main_file_t.
+% node = the nodal coordinates of the truss
+% conn = the connectivity matrix of truss
+
+% Define necessary variables 
+nodex = node(:,1); % x component of nodes
+nodey = node(:,2); % y component of nodes
+ne = length(conn); % number of elements
+nn = size(node, 1); % number of nodes
+dof = 2*nn; % degree of freedom
+
+% Initialize variable to return
+f = zeros(dof,1);
+
+% Plot the interactive figure  
+figure
+plot(nodex,nodey,'o')
+hold on
+
+for ii=1:ne
+    n1 = conn(ii,1);
+    n2 = conn(ii,2);
+    
+    x1 = node(n1,1); y1 = node(n1,2);
+    x2 = node(n2,1); y2 = node(n2,2);
+    
+    plot([x1 x2],[y1 y2],'b--')
+    axis equal
+end
+
+% Define the push buttons using the uicontrol(), and assigning each of them 
+% a callback function
+force7 = uicontrol('style','pushbutton');
+set(force7,'position', [100 300, 70, 20]);
+set(force7,'string','Put force here!');
+set(force7,'callback',{@set_force7})
+
+force6 = uicontrol('style','pushbutton');
+set(force6,'position', [250 300, 70, 20]);
+set(force6,'string','Put force here!');
+set(force6,'callback',{@set_force6})
+
+force5 = uicontrol('style','pushbutton');
+set(force5,'position', [400 300, 70, 20]);
+set(force5,'string','Put force here!');
+set(force5,'callback',{@set_force5})
+
+force4 = uicontrol('style','pushbutton');
+set(force4,'position', [480 115, 70, 20]);
+set(force4,'string','Put force here!');
+set(force4,'callback',{@set_force4})
+
+force3 = uicontrol('style','pushbutton');
+set(force3,'position', [330 115, 70, 20]);
+set(force3,'string','Put force here!');
+set(force3,'callback',{@set_force3})
+
+force2 = uicontrol('style','pushbutton');
+set(force2,'position', [180 115, 70, 20]);
+set(force2,'string','Put force here!');
+set(force2,'callback',{@set_force2})
+
+force1 = uicontrol('style','pushbutton');
+set(force1,'position', [30 115, 70, 20]);
+set(force1,'string','Put force here!');
+set(force1,'callback',{@set_force1})
+
+% Display the user interface when a button is pressed
+function set_force7(force7, ~) 
+if get(force7,'value')
+    nid = 7;
+    forceCell = inputdlg('How much force (N) do you want to apply to the system? (a positive value means force towards up or right, a negative value means force towards down and left )');
+    force = str2num(forceCell{1});
+    
+    directionCell = inputdlg('In the x direction (type "x") or the y direction (type "y")');
+    direction = (directionCell{1}); 
+
+        switch direction
+        case 'x'
+            location = 2*nid-1;
+        case 'y'
+            location = 2*nid;
+    end
+    
+    f(location) = force;
+    assignin('base','f',f)
+ 
+end
+close all
+end
+
+function set_force6(force6, ~) 
+
+if get(force6,'value')
+    nid = 6;
+    forceCell = inputdlg('How much force (N) do you want to apply to the system? (a positive value means force towards up or right, a negative value means force towards down and left )');
+    force = str2num(forceCell{1});
+    
+    directionCell = inputdlg('In the x direction (type "x") or the y direction (type "y")');
+    direction = (directionCell{1}); 
+    
+    switch direction
+        case 'x'
+            location = 2*nid-1;
+        case 'y'
+            location = 2*nid;
+    end
+    
+    f(location) = force;
+    assignin('base','f',f)
+end
+close all
+end
+
+function set_force5(force5, ~) 
+
+if get(force5,'value')
+    nid = 5;
+    forceCell = inputdlg('How much force (N) do you want to apply to the system? (a positive value means force towards up or right, a negative value means force towards down and left )');
+    force = str2num(forceCell{1});
+    
+    directionCell = inputdlg('In the x direction (type "x") or the y direction (type "y")');
+    direction = (directionCell{1}); 
+    
+    switch direction
+        case 'x'
+            location = 2*nid-1;
+        case 'y'
+            location = 2*nid;
+    end
+    
+    f(location) = force;
+    assignin('base','f',f)
+
+
+end
+close all
+end
+
+function set_force4(force4, ~) 
+
+if get(force4,'value')
+    nid = 4;
+    forceCell = inputdlg('How much force (N) do you want to apply to the system? (a positive value means force towards up or right, a negative value means force towards down and left )');
+    force = str2num(forceCell{1});
+    
+    directionCell = inputdlg('In the x direction (type "x") or the y direction (type "y")');
+    direction = (directionCell{1}); 
+
+        switch direction
+        case 'x'
+            location = 2*nid-1;
+        case 'y'
+            location = 2*nid;
+    end
+    
+    f(location) = force;
+    assignin('base','f',f)
+
+    
+end
+close all
+end
+
+function set_force3(force3, ~) 
+
+if get(force3,'value')
+    nid = 3;
+    forceCell = inputdlg('How much force (N) do you want to apply to the system? (a positive value means force towards up or right, a negative value means force towards down and left )');
+    force = str2num(forceCell{1});
+    
+    directionCell = inputdlg('In the x direction (type "x") or the y direction (type "y")');
+    direction = (directionCell{1}); 
+
+    switch direction
+        case 'x'
+            location = 2*nid-1;
+        case 'y'
+            location = 2*nid;
+    end
+    
+    f(location) = force;
+    assignin('base','f',f)
+end
+close all
+end
+
+function set_force2(force2, ~) 
+
+if get(force2,'value')
+    nid = 2;
+    forceCell = inputdlg('How much force (N) do you want to apply to the system? (a positive value means force towards up or right, a negative value means force towards down and left )');
+    force = str2num(forceCell{1});
+    
+    directionCell = inputdlg('In the x direction (type "x") or the y direction (type "y")');
+    direction = (directionCell{1}); 
+    
+    switch direction
+        case 'x'
+            location = 2*nid-1;
+        case 'y'
+            location = 2*nid;
+    end
+    
+    f(location) = force;
+    assignin('base','f',f)
+    
+end
+close all
+end
+
+function set_force1(force1, ~) 
+
+if get(force1,'value')
+    nid = 1;
+    forceCell = inputdlg('How much force (N) do you want to apply to the system? (a positive value means force towards up or right, a negative value means force towards down and left )');
+    force = str2num(forceCell{1});
+    
+    directionCell = inputdlg('In the x direction (type "x") or the y direction (type "y")');
+    direction = (directionCell{1}); 
+
+    switch direction
+        case 'x'
+            location = 2*nid-1;
+        case 'y'
+            location = 2*nid;
+    end
+    
+    f(location) = force;
+    assignin('base','f',f)
+    
+end
+close all
+end
+
+end
+
